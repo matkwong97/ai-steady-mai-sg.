@@ -14,7 +14,27 @@ function friendOccasion(i){const now=new Date(),month=now.getMonth()+1,day=now.g
 const candidates=[d['Officially together']?.date,d.anniversary,d.date,d.startDate,w.date,load('anniversary','')].filter(Boolean);
 if(candidates.some(x=>{const m=String(x).match(/^(\d{4})-(\d{2})-(\d{2})/);return m&&Number(m[2])===month&&Number(m[3])===day}))occasion=`Happy anniversary! 🎉 Take a moment to celebrate what you've learned together, not just the highlight reel.`;
 return occasion?`<div class="event-wish" role="note"><strong>${esc(name(i))} says:</strong> ${esc(occasion)}</div>`:''}
-function friendChatInvitation(i){return `<div class="card chat-invite"><h2>Something to tell me? 💬</h2><p>Good news, confusing feelings or a tricky situation? I'm here to listen and help you think through the next step.</p><button onclick="go('chat${i}')">Text ${esc(name(i))} →</button><p class="small muted">Works offline without an API key. Guided replies use topic recognition, not generative AI. Avoid sharing sensitive identifying details.</p></div>`}
+// Eight distinct invitations: four stages × male/female character presentation.
+// Personalised display names still come from name(i), never hard-coded.
+const friendInvitations={
+ male:[
+  {heading:"Got something on your mind? 💬",body:"Got a crush, feeling unsure, or just had a small win? Tell me what happened. We'll sort the signals from the guesses and work out a respectful next step.",button:"Let's talk"},
+  {heading:"Eh, got story to share? 💬",body:"First-date butterflies, awkward texts, or something exciting? Spill lah. I'll help you think of a thoughtful move without making things more complicated.",button:"Tell me more"},
+  {heading:"How are things between you two? 💬",body:"Whether you're celebrating a good week or working through a disagreement, you don't have to figure it out all at once. Let's find a way to talk and move forward together.",button:"Talk it through"},
+  {heading:"Let's talk about married life 💬",body:"Big decisions, family matters, everyday teamwork—or a happy milestone? Tell me what's going on. We'll look at the practical options with care for both partners.",button:"Have a chat"}
+ ],
+ female:[
+  {heading:"Hey, what's on your heart? 💬",body:"Someone caught your eye? Feeling nervous, hopeful, or a bit confused? You can tell me. We'll make sense of it together, at your own pace and with your boundaries intact.",button:"Chat with me"},
+  {heading:"Girl, tell me everything! 💬",body:"Cute date story, mixed signals, or a plan that went sideways? I'm listening! We'll find a kind, confident next step that feels like you.",button:"Let's chat"},
+  {heading:"Want to get something off your chest? 💬",body:"Relationships bring lovely moments and tricky conversations. Whether you need to celebrate or untangle a worry, let's work out what a healthy next step could look like.",button:"I'm listening"},
+  {heading:"How's life as a team? 💬",body:"Marriage can be beautiful, messy, and everything in between. Share a joy or a concern—let's think through what supports both of you, without judgment or pressure.",button:"Talk to me"}
+ ]
+};
+function friendChatInvitation(i){
+ const gender=profile.gender==='female'?'female':'male';
+ const invitation=friendInvitations[gender][i]||friendInvitations.male[0];
+ return `<div class="card chat-invite"><h2>${esc(invitation.heading)}</h2><p>${esc(invitation.body)}</p><button onclick="go('chat${i}')">${esc(invitation.button)} — Text ${esc(name(i))} →</button><p class="small muted">Private on this device · Offline topic-based guidance, not generative AI. Please avoid sensitive identifying details.</p></div>`;
+}
 function chatKey(i){return 'chat_'+(profile.gender==='female'?'female':'male')+'_'+i}
 function savedKey(i){return 'chat_saved_'+(profile.gender==='female'?'female':'male')+'_'+i}
 function feedbackKey(i){return 'chat_feedback_'+(profile.gender==='female'?'female':'male')+'_'+i}

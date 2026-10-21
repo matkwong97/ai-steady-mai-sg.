@@ -7,3 +7,4 @@ This build contains a conversational multiple-choice quiz, differentiated friend
 ## Honest limitations
 This is not yet a fully generative AI product. Relationship analysis and marital support remain deterministic; itinerary suggestions are curated, not verified live travel-time optimisation. Weather relies on public online services. Illustrations are hand-coded SVG characters rather than AI-generated photographs. To support actual generative conversations and real-time local venue selection, add a server-side AI service, securely configured credentials, and geocoding/routing/place data integrations. Do not expose an AI API key in browser JavaScript.
 Deployment refresh: Ticketmaster API configured
+v16 deployment refresh

@@ -1,13 +1,13 @@
+import {PET_ROSTER} from '../../pet-roster.mjs';
 const json=(v,status=200)=>new Response(JSON.stringify(v),{status,headers:{'content-type':'application/json','cache-control':'no-store'}});
 const hash=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(x=>x.toString(16).padStart(2,'0')).join('');
 const day=86400000;
 
-const FAMILIES=['Lumi','Ember','Moss','Tide'];
-const ENDINGS=['ling','ora','fin','rix'];
-const TRAITS=['gentle','playful','serene','bold'];
-function formId(p){return (p.path||[p.egg||0]).join('-')}
-function species(p){const path=p.path||[p.egg||0];const first=FAMILIES[path[0]%4];const suffix=path.slice(1).map((v,i)=>ENDINGS[(v+i)%4]).join('');return first+(suffix||' Egg')}
-function enrich(p){if(!p)return p;if(!Number.isInteger(p.egg))p.egg=Math.abs((p.born||0)%4);if(!Array.isArray(p.path))p.path=[p.egg];if(p.path.length<Math.min(5,(p.stage||0)+1)){while(p.path.length<Math.min(5,(p.stage||0)+1))p.path.push(p.path.length===1?0:(p.egg+p.path.length)%4)}if(!p.discovered||typeof p.discovered!=='object')p.discovered={};if(!p.careTraits)p.careTraits={feed:0,touch:0,groom:0,play:0,rest:0};if(!p.history)p.history=[];if(!p.discovered[formId(p)])p.discovered[formId(p)]={id:formId(p),species:species(p),name:p.name||'',at:p.born||Date.now(),traits:{...p.careTraits}};return p}
+const FAMILIES=['Terra','Aqua','Aero','Shadow'];
+function formId(p){const path=p.path||[p.egg||0],st=Math.min(4,Math.max(0,p.stage??(path.length-1)));return `${path[0]}-${st}-${st<2?0:(path[2]||0)}`}
+function species(p){const path=p.path||[p.egg||0],st=Math.min(4,Math.max(0,p.stage??(path.length-1)));return PET_ROSTER.find(x=>x.family===path[0]&&x.stage===st&&x.branch===(st<2?0:(path[2]||0)))?.name||'Love Pet'}
+function migrate(p){if(!p||p.rosterV41)return;const next={};for(const [id,entry] of Object.entries(p.discovered||{})){const parts=id.split('-').map(Number);if(parts[0]<0||parts[0]>3)continue;const st=Math.min(4,parts.length-1),branch=st<2?0:(parts[2]||0),key=`${parts[0]}-${st}-${branch}`;const r=PET_ROSTER.find(x=>x.family===parts[0]&&x.stage===st&&x.branch===branch);if(r&&!next[key])next[key]={...entry,id:key,species:r.name}}p.discovered=next;p.rosterV41=true}
+function enrich(p){if(!p)return p;if(!Number.isInteger(p.egg))p.egg=Math.abs((p.born||0)%4);if(!Array.isArray(p.path))p.path=[p.egg];if(p.path.length<Math.min(5,(p.stage||0)+1)){while(p.path.length<Math.min(5,(p.stage||0)+1))p.path.push(p.path.length===1?0:(p.egg+p.path.length)%4)}if(!p.discovered||typeof p.discovered!=='object')p.discovered={};migrate(p);if(!p.careTraits)p.careTraits={feed:0,touch:0,groom:0,play:0,rest:0};if(!p.history)p.history=[];if(!p.discovered[formId(p)])p.discovered[formId(p)]={id:formId(p),species:species(p),name:p.name||'',at:p.born||Date.now(),traits:{...p.careTraits}};return p}
 function pickPath(p){const t=p.careTraits||{}, vals=[(t.touch||0)+(t.groom||0)*.7,(t.play||0)+(t.rest||0)*.3,(t.groom||0)+(t.rest||0),(t.feed||0)+(t.play||0)*.4];const total=vals.reduce((x,y)=>x+y,0);if(!total)return (p.egg+p.path.length)%4;const ranked=vals.map((v,i)=>({v,i})).sort((x,y)=>y.v-x.v||x.i-y.i);const quality=Math.round((p.hunger+p.happy+p.clean+p.energy+p.health)/5);return quality>=70?ranked[0].i:quality>=40?ranked[1].i:ranked[2].i}
 function evolveOne(p){enrich(p);const next=p.path.length===1?0:pickPath(p);p.path.push(next);p.stage=p.path.length-1;p.discovered[formId(p)]={id:formId(p),species:species(p),name:p.name||'',at:Date.now(),traits:{...p.careTraits}};p.history.push({id:formId(p),species:species(p),at:Date.now()});p.events.unshift({at:Date.now(),actor:'Love Pet',action:'evolved into '+species(p)})}
 

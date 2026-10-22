@@ -213,4 +213,22 @@ body:has(.love-intro) .card:not(.love-intro) button{padding:9px 13px}
 button,a,[onclick]{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 button:active,.love-tile:active{transform:scale(.985)}
 @media(prefers-reduced-motion:reduce){button,.love-tile{transition:none!important}}
-</style></head><body><header><strong>💗 AI Steady Mai SG</strong><div class="header-actions"><button class="header-mail" type="button" onclick="go('pager')" aria-label="Open Love Pager">📟<span class="pager-unread hidden"></span></button><button class="secondary" onclick="toggleTheme()" id="theme">🌙 Night mode</button></div></header><main id="app"></main><script src="app.js?v=46"></script><script src="friend-chat.js?v=37-7"></script><script src="love-journey-data.js?v=37-7"></script><script src="love-space.js?v=46"></script><script src="pet-roster.js?v=41"></script><script src="love-pet.js?v=45"></script><script>window.addEventListener("load",()=>{try{render();if(typeof pagerMailboxCheck==="function")pagerMailboxCheck()}catch(e){console.error("AI Steady startup failure",e);const a=document.getElementById("app");if(a)a.innerHTML="<section class=\"card\"><h2>Unable to start</h2><p>Something went wrong loading the app. Your saved data has not been cleared.</p><p id=\"startup-detail\"></p></section>";const d=document.getElementById("startup-detail");if(d)d.textContent=String(e)}})</script></body></html>
+
+/* v47: contained, responsive friend sparring arena */
+.friend-battle-intro{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.friend-battle-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.friend-battle-choice{border:1px solid var(--border,#d9cbd8);border-radius:16px;padding:14px;text-align:left;background:var(--card,#fff);color:inherit;cursor:pointer;min-width:0}
+.friend-battle-choice strong,.friend-battle-choice small{display:block}.friend-battle-choice small{opacity:.7;margin-top:5px}
+.friend-battle-choice:focus-visible,.friend-battle-moves button:focus-visible{outline:3px solid #d684ac;outline-offset:2px}
+.friend-battle-scene{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;margin:16px 0}
+.friend-battle-creature{border:1px solid #ffffff35;border-radius:18px;overflow:hidden;background:linear-gradient(145deg,#dbe8ed,#f5dfe9);padding:8px;min-width:0;text-align:center}
+.friend-battle-creature img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;display:block}
+.friend-battle-creature b,.friend-battle-creature small{display:block;overflow-wrap:anywhere;margin-top:5px}
+.friend-battle-creature progress{width:100%;accent-color:#4ea88b}
+.friend-battle-moves{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.friend-battle-moves button{text-align:left;white-space:normal;min-height:64px}
+.friend-battle-dialogue{padding:14px;border-radius:15px;background:linear-gradient(110deg,#f6e6ef,#e9f2fa);color:#4b3652;margin:12px 0}
+.friend-battle-log{max-height:110px;overflow:auto;font-size:.85rem;opacity:.85}
+.friend-battle-invite{padding:12px;border:1px solid #dbb8d0;border-radius:14px;margin-top:12px}
+@media(max-width:380px){.friend-battle-grid{grid-template-columns:1fr}.friend-battle-scene{gap:5px}.friend-battle-creature{padding:5px}}
+</style></head><body><header><strong>💗 AI Steady Mai SG</strong><div class="header-actions"><button class="header-mail" type="button" onclick="go('pager')" aria-label="Open Love Pager">📟<span class="pager-unread hidden"></span></button><button class="secondary" onclick="toggleTheme()" id="theme">🌙 Night mode</button></div></header><main id="app"></main><script src="app.js?v=46"></script><script src="friend-chat.js?v=37-7"></script><script src="love-journey-data.js?v=37-7"></script><script src="love-space.js?v=46"></script><script src="pet-roster.js?v=41"></script><script src="love-pet.js?v=47"></script><script src="friend-pet-battle.js?v=47"></script><script>window.addEventListener("load",()=>{try{render();if(typeof pagerMailboxCheck==="function")pagerMailboxCheck()}catch(e){console.error("AI Steady startup failure",e);const a=document.getElementById("app");if(a)a.innerHTML="<section class=\"card\"><h2>Unable to start</h2><p>Something went wrong loading the app. Your saved data has not been cleared.</p><p id=\"startup-detail\"></p></section>";const d=document.getElementById("startup-detail");if(d)d.textContent=String(e)}})</script></body></html>

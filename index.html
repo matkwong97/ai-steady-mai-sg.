@@ -39,6 +39,18 @@ html,body,main,#app{min-height:0}body.dark,body.dark main,body.dark #app{backgro
 .pager-below .pager-inbox{margin-top:25px}
 .pager-below .pager-row{border-color:#a5a5a540}
 @media(max-width:390px){.pager-device{margin-top:22px;padding-bottom:12px}.pager-lcd{min-height:180px}.pager-controls .pager-arrow{height:40px}}
+
+/* v38.3: history is available on demand without stretching the Love Pager screen */
+.pager-inbox-collapsible{margin-top:24px;border:1px solid rgba(170,170,170,.28);border-radius:16px;padding:0 15px;overflow:hidden}
+.pager-inbox-collapsible>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 2px;font-weight:750;font-size:1.08rem;touch-action:manipulation}
+.pager-inbox-collapsible>summary::-webkit-details-marker{display:none}
+.pager-inbox-collapsible>summary:after{content:"⌄";font-size:1.4rem;line-height:1;transition:transform .18s ease}
+.pager-inbox-collapsible[open]>summary:after{transform:rotate(180deg)}
+.pager-inbox-collapsible>summary:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.pager-history-hint{font-weight:400;font-size:.76rem;opacity:.68;margin-left:auto}
+.pager-inbox-collapsible #pager-history{padding-top:8px}
+.pager-inbox-collapsible>button{margin-bottom:16px}
+@media(max-width:380px){.pager-history-hint{font-size:.66rem}}
 </style><style> .header-actions{display:flex;align-items:center;gap:8px}.header-mail{position:relative;background:transparent;color:inherit;border:1px solid currentColor;padding:9px 12px;min-width:44px;min-height:44px}.pager-unread{position:absolute;top:-8px;right:-7px;background:#e84d79;color:white;border:2px solid #fff;border-radius:99px;min-width:22px;height:22px;display:grid;place-items:center;font-size:12px;font-weight:800;padding:0 4px}.pager-unread.hidden{display:none}.home-pager-strip{display:flex;justify-content:flex-start;margin:0 0 8px}.pager-mailbox{position:relative;display:inline-flex;align-items:center;gap:8px;border-radius:18px;padding:12px 20px;background:#fce5ed;color:#802a50;border:1px solid #efbfd0;font-weight:700}.dark .pager-mailbox{background:#372939;color:#ffe5ee;border-color:#715063}.pager-notice{border-radius:14px;background:#fce6ee;color:#84244e;padding:12px 15px;cursor:pointer;font-weight:650}.dark .pager-notice{background:#40283a;color:#ffe0ea}.pager-notice[hidden]{display:none}@media(max-width:380px){header{padding:10px}header strong{font-size:.92rem}.header-actions{gap:5px}.header-actions button{padding:9px}} /* v29: compact home layout, left aligned pager */ html{background:#fff9fa;min-height:100%;}html:has(body.dark){background:#171521;color-scheme:dark}body{min-height:100dvh}body.dark{background:#171521}body.dark main{background:#171521}
 body:has(.love-intro) main{padding-top:12px}
 body:has(.love-intro) .love-intro{padding:12px 15px;margin:8px 0 10px;border-radius:16px}

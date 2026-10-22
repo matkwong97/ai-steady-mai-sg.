@@ -80,7 +80,7 @@ function savedMessagesMarkup(i){
  return `<details class="saved-replies"><summary>Saved advice (${saved.length})</summary>${saved.length?saved.map(m=>`<div class="saved-note"><p>${esc(m.content)}</p><button type="button" class="mini-action" onclick="deleteSavedFriend(${i},'${esc(m.id)}')">Remove saved message</button></div>`).join(''):'<p class="small muted">Tap ☆ Save under a reply to keep it beyond 24 hours.</p>'}</details>`;
 }
 function chatPage(i){if(!(i>=0&&i<=3))return '<p>Friend not found.</p>';
- const person=esc(name(i)),photo=`assets/${profile.gender==='female'?'women':'men'}-${i}.jpg`,messages=getChat(i);
+ const person=esc(name(i)),photo=friendPortrait(i),messages=getChat(i);
  const starter=['Hey! Tell me what’s on your mind. No need to impress anyone here.','Aiyo, what happened? Good news or dating drama, I’m listening!','Hey you. How are things between you two? We can work through it together.','Hello! Married life has its ups and downs. What would you like to talk through?'][i];
  return `<div class="chat-head"><img src="${photo}" alt="${person}'s portrait"><div><strong>${person}</strong><div class="small muted">${esc(friendStages[i])} · Digital friend</div></div></div><div id="chat-log" class="chat-log" aria-live="polite">${messages.length?messages.map(m=>messageMarkup(i,m)).join(''):`<div class="chat-entry received"><div class="bubble theirs">${esc(starter)}</div></div>`}</div><form id="chat-form" class="chat-form" onsubmit="sendFriendMessage(event,${i})"><label for="chat-text" class="hidden">Message ${person}</label><textarea id="chat-text" maxlength="1500" rows="2" placeholder="Text ${person}..." required></textarea><button id="chat-send" type="submit">Send</button></form><p id="chat-status" class="chat-note" role="status" aria-live="polite">Messages disappear after 24 hours. Save helpful replies to keep them. Reactions adjust local topic preferences, not AI training. Offline guided advice may miss nuance.</p>${savedMessagesMarkup(i)}<details><summary>Conversation & privacy</summary><p class="small">Recent chat is automatically cleared 24 hours after each message. Saved advice stays on this device until removed. Feedback preferences also stay on this browser. Nothing from this chat is sent to an AI service. Avoid identifying details; this is not counselling or an emergency service.</p><button class="secondary" onclick="clearFriendChat(${i})">Clear this conversation</button></details><div class="card"><h3>Useful resources for this stage</h3>${links(i)}</div>`}
 function clearFriendChat(i){if(!confirm('Clear this conversation from this device? Saved advice is kept.'))return;store(chatKey(i),[]);render()}
@@ -270,7 +270,7 @@ async function sendFriendMessage(event,i){
  log.scrollTop=log.scrollHeight;
  try{
   await new Promise(resolve=>setTimeout(resolve,250));
-  const reply=offlineReply(i,message,items);
+  const baseReply=offlineReply(i,message,items);const context=friendRelationshipContext(i);const reply=context&&!/abuse|violence|unsafe|threat|suicid|self.harm/i.test(message)?context+'\n\n'+baseReply:baseReply;
   const topic=detectDialogue(message)[0]||'general';
   const answer={role:'assistant',content:reply,at:Date.now(),id:'a'+Date.now()+'-'+Math.floor(Math.random()*1e6),topic,liked:false};
   items.push(answer);putChat(i,items);

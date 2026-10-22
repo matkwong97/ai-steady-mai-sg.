@@ -711,7 +711,8 @@ function loveRoute(){if(!profileReady()){page='home';history=[];oldRender();retu
 const oldRender=render;render=function(){if(['lovespace','littlelove','lovejourney','couplecards','scrapbook','sharedscrapbook','pager','account'].includes(page))loveRoute();else{oldRender();if(page==='home'){const app=document.getElementById('app');const div=document.createElement('div');div.className='card love-intro';div.innerHTML='<h2>💗 Your Love Space</h2><p>Daily gestures, meaningful questions, precious memories and a little pager for your person.</p><button onclick="go(\'lovespace\')">Explore Love Space →</button>';app.insertBefore(div,app.firstChild)}if(page==='friends'){const edit=document.querySelector('.name-grid')?.closest('.card');if(edit){const box=document.createElement('div');box.innerHTML='<label for="partner-name-friends">Your partner’s name or nickname</label><input id="partner-name-friends" maxlength="50" placeholder="e.g. Jas" value="'+esc(load('partner_name',''))+'"><button class="secondary" onclick="store(\'partner_name\',document.getElementById(\'partner-name-friends\').value.trim());render()">Save partner name</button>';edit.append(box)}}}};
 const previousOfflineReply=typeof offlineReply==='function'?offlineReply:null;
 if(previousOfflineReply){offlineReply=function(i,message,history){let result=previousOfflineReply(i,message,history);const partner=load('partner_name','').trim();if(partner&&typeof result==='string')result=result.replace(/\byour partner\b/gi,partner).replace(/\byour girlfriend\b/gi,partner).replace(/\byour boyfriend\b/gi,partner);return result}}
-render();
+// Initialise only after every script and its const declarations have finished.
+document.addEventListener('DOMContentLoaded', function(){ render(); }, {once:true});
 
 /* v36 Love Journey: secular, original, flexible; private reflections never sent to the server. */
 const journeyKey='love_journey_v36';

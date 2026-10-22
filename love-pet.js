@@ -62,7 +62,7 @@ async function homeShortcut(){
  let p=read(),social='';if(p){advance(p);save(p)}
  if(localStorage.getItem('steady_room_token')){try{const r=await api('get');if(r.pet){p=r.pet;advance(p);const e=p.events?.[0];if(e&&e.actor!=='Love Pet'&&e.actor!==r.you&&e.at>now()-day)social=`${e.actor} ${e.action} ${p.name||'your Love Pet'}!`}}catch{}}
  if(!document.getElementById('home-pet-notice'))return;
- const t=social||eventText(p)||'Raise a little companion together or on your own.';
+ const t=social||eventText(p)||'Raise a little companion together or on your own.';const dot=document.querySelector('.pet-shortcut-dot');if(dot)dot.hidden=!social&&!p?.dead&&!(p&&stage(p)>0&&(p.hunger<35||p.health<35));
  el.textContent=t;el.hidden=false;
 }
 async function remove(){if(!current||busy)return;const shared=mode==='shared';if(!confirm(shared?'Delete the shared pet for BOTH partners? This cannot be undone.':'Delete your personal pet and its journal? This cannot be undone.'))return;busy=true;try{if(shared){await api('delete',{})}else{const old=read();if(old)localStorage.setItem('steady_pet_archive',JSON.stringify({discovered:old.discovered,history:old.history}));localStorage.removeItem(KEY)}current=null;await select(mode)}catch(e){msg(e.message)}finally{busy=false}}

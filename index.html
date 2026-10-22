@@ -26,6 +26,19 @@ html,body,main,#app{min-height:0}body.dark,body.dark main,body.dark #app{backgro
 .kaki-page-head p{margin:.2rem 0}
 
 .friend-style-settings{margin:18px 0;padding:15px;border:1px solid #e9d3dc;border-radius:14px}.friend-style-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}.friend-style-option{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px;border:2px solid #eadce1;border-radius:14px;background:transparent;cursor:pointer;color:inherit}.friend-style-selected{border-color:#a74470;background:rgba(214,101,143,.09)}.friend-style-preview{width:72px;height:72px;overflow:hidden;border-radius:14px}.friend-style-preview img{width:100%;height:100%;object-fit:cover}.friend-style-option .small{font-size:.8rem}
+
+/* v38.1: short classic pager shell; separate controls and inbox beneath */
+.pager-device{max-width:510px;margin:26px auto 12px;padding-bottom:13px;border-radius:38px 38px 40px 40px}
+.pager-lcd{min-height:190px;margin:15px 0 12px}
+.pager-controls{pointer-events:auto;margin:7px 0 3px}
+.pager-controls .pager-arrow{display:grid;place-items:center;flex:1;max-width:125px;height:42px;margin:0;padding:0;border:1px solid #22262a;border-radius:26px;background:linear-gradient(#50555a,#17191d);box-shadow:inset 0 2px 3px #ffffff35,0 3px 6px #0009;color:#9df848;font-size:1.4rem;cursor:pointer}
+.pager-controls .pager-arrow:disabled{opacity:.36;cursor:default}
+.pager-controls .pager-arrow:focus-visible{outline:3px solid #a4f964;outline-offset:3px}
+.pager-position{text-align:center;color:#c9d7ce;font-size:.75rem;letter-spacing:.03em;margin:6px 0 0}
+.pager-below{max-width:560px;margin:14px auto 20px}
+.pager-below .pager-inbox{margin-top:25px}
+.pager-below .pager-row{border-color:#a5a5a540}
+@media(max-width:390px){.pager-device{margin-top:22px;padding-bottom:12px}.pager-lcd{min-height:180px}.pager-controls .pager-arrow{height:40px}}
 </style><style> .header-actions{display:flex;align-items:center;gap:8px}.header-mail{position:relative;background:transparent;color:inherit;border:1px solid currentColor;padding:9px 12px;min-width:44px;min-height:44px}.pager-unread{position:absolute;top:-8px;right:-7px;background:#e84d79;color:white;border:2px solid #fff;border-radius:99px;min-width:22px;height:22px;display:grid;place-items:center;font-size:12px;font-weight:800;padding:0 4px}.pager-unread.hidden{display:none}.home-pager-strip{display:flex;justify-content:flex-start;margin:0 0 8px}.pager-mailbox{position:relative;display:inline-flex;align-items:center;gap:8px;border-radius:18px;padding:12px 20px;background:#fce5ed;color:#802a50;border:1px solid #efbfd0;font-weight:700}.dark .pager-mailbox{background:#372939;color:#ffe5ee;border-color:#715063}.pager-notice{border-radius:14px;background:#fce6ee;color:#84244e;padding:12px 15px;cursor:pointer;font-weight:650}.dark .pager-notice{background:#40283a;color:#ffe0ea}.pager-notice[hidden]{display:none}@media(max-width:380px){header{padding:10px}header strong{font-size:.92rem}.header-actions{gap:5px}.header-actions button{padding:9px}} /* v29: compact home layout, left aligned pager */ html{background:#fff9fa;min-height:100%;}html:has(body.dark){background:#171521;color-scheme:dark}body{min-height:100dvh}body.dark{background:#171521}body.dark main{background:#171521}
 body:has(.love-intro) main{padding-top:12px}
 body:has(.love-intro) .love-intro{padding:12px 15px;margin:8px 0 10px;border-radius:16px}

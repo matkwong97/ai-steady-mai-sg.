@@ -40,6 +40,9 @@ function accountPage(){go('pager')}
 let pagerRefresh=0;
 // Retro pager display state is presentation-only. Room credentials and messages remain unchanged.
 let pagerShownMessageId='';
+let pagerIncomingPages=[];
+let pagerViewIndex=0;
+let pagerViewId='';
 function pagerDisplay(code,text,fromPartner=false,stamp=0,animate=false){
  const screen=document.getElementById('pager-screen'),preview=document.getElementById('pager-preview'),lcd=document.getElementById('pager-lcd');
  if(!screen||!preview||!lcd)return;
@@ -50,7 +53,21 @@ function pagerDisplay(code,text,fromPartner=false,stamp=0,animate=false){
  if(animate){void lcd.offsetWidth;lcd.classList.add('pager-new-arrival');setTimeout(()=>lcd.classList.remove('pager-new-arrival'),2400)}
 }
 
-async function pagerPage(){pagerMailboxCheck();loveShell('Love Pager 📟',`<div class="pager-device"><div class="pager-top-bump" aria-hidden="true"></div><div class="pager-brand">AI STEADY MAI SG <span>♥ LOVE PAGER</span></div><div class="pager-lcd" id="pager-lcd" role="status" aria-live="polite"><div class="pager-lcd-top"><span aria-hidden="true">▂▄▆ 📩</span><span>LOVE PAGER</span><span aria-hidden="true">▰</span></div><small id="pager-lcd-sender">YOUR PRIVATE SIGNAL</small><strong id="pager-screen">143</strong><p id="pager-preview">I love you ❤️</p><div class="pager-lcd-bottom"><span id="pager-lcd-time">READY TO PAGE</span><span aria-hidden="true">▶</span></div></div><div class="pager-controls" aria-hidden="true"><span>◀</span><i></i><i></i><span>▶</span></div><div id="pager-connection"><p>Loading your pager…</p></div></div><p id="love-status" role="status" aria-live="polite"></p>`);const area=document.getElementById('pager-connection');if(!roomToken()){area.innerHTML=`<h3>Just the two of you ♡</h3><p class="small">No email or account needed. Create a private room and share the one-time invitation with your person. Your connection stays saved on this device.</p><label>Your name</label><input id="pager-name" maxlength="40" placeholder="e.g. Matthew"><button onclick="pagerCreate()">Create our room ♡</button><p class="small muted">Already invited? Enter your partner's code below.</p><label>Your name</label><input id="pager-join-name" maxlength="40" placeholder="e.g. Jas"><label>Invitation code</label><input id="pager-code" maxlength="17" autocapitalize="characters" placeholder="e.g. LOVE-AB12CD34EF56"><button class="secondary" onclick="pagerJoin()">Join my partner</button><details><summary>Moved phones or cleared browser data?</summary><p class="small">Enter your private recovery key to restore your existing room access.</p><input id="pager-recover-key" placeholder="Your private recovery key" autocapitalize="off"><button class="secondary" onclick="pagerRecover()">Restore my pager</button></details>`;return}try{const r=await roomAPI('status');if(!document.getElementById('pager-connection'))return;if(!r.connected){area.innerHTML=`<h3>Room ready ♡</h3><p class="small">Waiting for your person to join. Your room is saved.</p><button onclick="pagerInvite()">Generate a new invitation</button><div id="pager-invite"></div><details><summary>My room settings</summary><button class="secondary" onclick="pagerCut()">Close room & cut link</button></details>`;return}area.innerHTML=`<p class="pager-connected">♥ Connected to <strong>${esc(r.partner_name)}</strong></p><label>Choose a little message</label><select id="pager-choice" onchange="pagerPreview()">${pagerPresets.map(([c,t])=>`<option value="${c}">${c} — ${esc(t)}</option>`).join('')}</select><button onclick="pagerSend()">Send page ♥</button><div class="pager-inbox"><h3>Our pages</h3><div id="pager-history">Loading…</div><button class="secondary" onclick="pagerHistory()">Refresh inbox ↻</button></div><details><summary>Manage our connection</summary><p class="small">Cut Link ends this connection for both of you. Your old pager history won't appear in a new room.</p><button class="secondary" onclick="pagerCut()">Cut link</button></details>`;pagerPreview();await pagerHistory();pagerMarkRead()}catch(e){loveMsg(e.message);if(e.message.includes('no longer valid')){localStorage.removeItem('steady_room_token');area.innerHTML='<button onclick="pagerPage()">Start again</button>'}}}
+function pagerMessageId(m){return String(m.created_at)+'|'+m.code+'|'+m.sender_name}
+function pagerPaintSelected(animate=false){
+ const m=pagerIncomingPages[pagerViewIndex];
+ if(m){pagerViewId=pagerMessageId(m);pagerDisplay(m.code,m.text,true,m.created_at,animate)}
+ const prev=document.getElementById('pager-prev'),next=document.getElementById('pager-next'),count=document.getElementById('pager-position');
+ if(prev)prev.disabled=!m||pagerViewIndex>=pagerIncomingPages.length-1;
+ if(next)next.disabled=!m||pagerViewIndex<=0;
+ if(count)count.textContent=m?`${pagerIncomingPages.length-pagerViewIndex} of ${pagerIncomingPages.length} received pages`:'No received pages yet';
+}
+function pagerNavigate(direction){
+ if(!pagerIncomingPages.length)return;
+ pagerViewIndex=Math.max(0,Math.min(pagerIncomingPages.length-1,pagerViewIndex+direction));
+ pagerPaintSelected(false);
+}
+async function pagerPage(){pagerIncomingPages=[];pagerViewIndex=0;pagerViewId='';pagerMailboxCheck();loveShell('Love Pager 📟',`<div class="pager-device"><div class="pager-top-bump" aria-hidden="true"></div><div class="pager-brand">AI STEADY MAI SG <span>♥ LOVE PAGER</span></div><div class="pager-lcd" id="pager-lcd" role="status" aria-live="polite"><div class="pager-lcd-top"><span aria-hidden="true">▂▄▆ 📩</span><span>LOVE PAGER</span><span aria-hidden="true">▰</span></div><small id="pager-lcd-sender">YOUR PRIVATE SIGNAL</small><strong id="pager-screen">143</strong><p id="pager-preview">I love you ❤️</p><div class="pager-lcd-bottom"><span id="pager-lcd-time">READY TO PAGE</span><span aria-hidden="true">▶</span></div></div><div class="pager-controls"><button type="button" id="pager-prev" class="pager-arrow" onclick="pagerNavigate(1)" aria-label="Previous received page, older" disabled>◀</button><i aria-hidden="true"></i><i aria-hidden="true"></i><button type="button" id="pager-next" class="pager-arrow" onclick="pagerNavigate(-1)" aria-label="Next received page, newer" disabled>▶</button></div><div class="pager-position" id="pager-position" aria-live="polite">No received pages yet</div></div><div class="pager-below" id="pager-connection"><p>Loading your pager…</p></div><p id="love-status" role="status" aria-live="polite"></p>`);const area=document.getElementById('pager-connection');if(!roomToken()){area.innerHTML=`<h3>Just the two of you ♡</h3><p class="small">No email or account needed. Create a private room and share the one-time invitation with your person. Your connection stays saved on this device.</p><label>Your name</label><input id="pager-name" maxlength="40" placeholder="e.g. Matthew"><button onclick="pagerCreate()">Create our room ♡</button><p class="small muted">Already invited? Enter your partner's code below.</p><label>Your name</label><input id="pager-join-name" maxlength="40" placeholder="e.g. Jas"><label>Invitation code</label><input id="pager-code" maxlength="17" autocapitalize="characters" placeholder="e.g. LOVE-AB12CD34EF56"><button class="secondary" onclick="pagerJoin()">Join my partner</button><details><summary>Moved phones or cleared browser data?</summary><p class="small">Enter your private recovery key to restore your existing room access.</p><input id="pager-recover-key" placeholder="Your private recovery key" autocapitalize="off"><button class="secondary" onclick="pagerRecover()">Restore my pager</button></details>`;return}try{const r=await roomAPI('status');if(!document.getElementById('pager-connection'))return;if(!r.connected){area.innerHTML=`<h3>Room ready ♡</h3><p class="small">Waiting for your person to join. Your room is saved.</p><button onclick="pagerInvite()">Generate a new invitation</button><div id="pager-invite"></div><details><summary>My room settings</summary><button class="secondary" onclick="pagerCut()">Close room & cut link</button></details>`;return}area.innerHTML=`<p class="pager-connected">♥ Connected to <strong>${esc(r.partner_name)}</strong></p><label>Choose a little message</label><select id="pager-choice" onchange="pagerPreview()">${pagerPresets.map(([c,t])=>`<option value="${c}">${c} — ${esc(t)}</option>`).join('')}</select><button onclick="pagerSend()">Send page ♥</button><div class="pager-inbox"><h3>Our pages</h3><div id="pager-history">Loading…</div><button class="secondary" onclick="pagerHistory()">Refresh inbox ↻</button></div><details><summary>Manage our connection</summary><p class="small">Cut Link ends this connection for both of you. Your old pager history won't appear in a new room.</p><button class="secondary" onclick="pagerCut()">Cut link</button></details>`;pagerPreview();await pagerHistory();pagerMarkRead()}catch(e){loveMsg(e.message);if(e.message.includes('no longer valid')){localStorage.removeItem('steady_room_token');area.innerHTML='<button onclick="pagerPage()">Start again</button>'}}}
 function pagerPreview(){const code=document.getElementById('pager-choice')?.value||'143';pagerDisplay(code,pagerPresets.find(x=>x[0]===code)?.[1]||'',false)}
 function pagerCredentials(r){localStorage.setItem('steady_room_token',r.token);pagerUnread=0;pagerLastRoom='';pagerShownMessageId='';pagerMailboxPaint();const box=document.getElementById('pager-connection');if(box)box.innerHTML=`<h3>Keep your recovery key safe ♡</h3><p class="small">This private key restores your pager if you change phones or clear browser data. It is shown only now. Don't share it with anyone, including your partner.</p><div class="pager-code" style="font-size:1rem;letter-spacing:.06em;overflow-wrap:anywhere">${esc(r.recovery_key)}</div><button onclick="navigator.clipboard.writeText('${r.recovery_key}').then(()=>loveMsg('Recovery key copied. Keep it somewhere private.')).catch(()=>loveMsg('Select and copy the key above.'))">Copy recovery key</button><button class="secondary" onclick="pagerPage()">Continue to my room →</button>`}
 async function pagerCreate(){try{const name=document.getElementById('pager-name').value.trim();if(!name)throw Error('Enter your name first.');const r=await roomAPI('create',{name});pagerCredentials(r)}catch(e){loveMsg(e.message)}}
@@ -61,20 +78,26 @@ async function pagerSend(){try{await roomAPI('send',{code:document.getElementByI
 async function pagerHistory(){try{
  const r=await roomAPI('messages');const el=document.getElementById('pager-history');if(!el)return;
  const messages=Array.isArray(r.messages)?r.messages:[];
- // Most recent incoming page is always shown on the LCD, even after this device sends a page.
- const incoming=messages.find(m=>!m.mine);
- if(incoming){
-  const id=String(incoming.created_at)+'|'+incoming.code+'|'+incoming.sender_name;
-  const seenKey='steady_pager_displayed_'+(pagerLastRoom||'current');
-  const lastShown=sessionStorage.getItem(seenKey);
-  const changed=id!==pagerShownMessageId;
-  if(changed||document.getElementById('pager-screen')?.textContent!==incoming.code||document.getElementById('pager-lcd-sender')?.textContent!=='♥ PAGE FROM YOUR PERSON'){
-   const isNew=!!lastShown&&lastShown!==id;
-   pagerDisplay(incoming.code,incoming.text,true,incoming.created_at,isNew);
-   pagerShownMessageId=id;sessionStorage.setItem(seenKey,id);
-  }
- }else if(messages.length&&!pagerShownMessageId){
-  const last=messages[0];pagerDisplay(last.code,last.text,false,last.created_at,false);
+ // Incoming pages only, newest first. Keep the currently browsed page during polling.
+ const incomingPages=messages.filter(m=>!m.mine).sort((a,b)=>Number(b.created_at)-Number(a.created_at));
+ const previousLatest=pagerIncomingPages[0]?pagerMessageId(pagerIncomingPages[0]):'';
+ const latest=incomingPages[0]?pagerMessageId(incomingPages[0]):'';
+ const isNewArrival=!!previousLatest&&!!latest&&latest!==previousLatest;
+ const seenKey='steady_pager_displayed_'+(pagerLastRoom||'current');
+ const lastShown=sessionStorage.getItem(seenKey);
+ pagerIncomingPages=incomingPages;
+ if(incomingPages.length){
+  const selectedIndex=incomingPages.findIndex(m=>pagerMessageId(m)===pagerViewId);
+  // On first load and when a new page arrives, show the newest incoming page.
+  // Otherwise retain the page being browsed, even when polling refreshes the inbox.
+  pagerViewIndex=(isNewArrival||!pagerViewId||selectedIndex<0)?0:selectedIndex;
+  const animate=isNewArrival||(!previousLatest&&!!lastShown&&lastShown!==latest);
+  pagerPaintSelected(animate);
+  pagerShownMessageId=latest;
+  sessionStorage.setItem(seenKey,latest);
+ }else{
+  pagerViewIndex=0;pagerViewId='';pagerPaintSelected(false);
+  if(messages.length){const last=messages[0];pagerDisplay(last.code,last.text,false,last.created_at,false)}
  }
  pagerMarkRead();
  el.innerHTML=messages.length?messages.map(m=>`<div class="pager-row"><strong>${m.mine?'You':'♥ '+esc(m.sender_name)} · ${esc(m.code)}</strong><div>${esc(m.text)}</div><small>${new Date(m.created_at).toLocaleString()}</small></div>`).join(''):'<p class="small">Your first page will appear here ♡</p>';

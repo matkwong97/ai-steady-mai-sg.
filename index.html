@@ -231,4 +231,33 @@ button:active,.love-tile:active{transform:scale(.985)}
 .friend-battle-log{max-height:110px;overflow:auto;font-size:.85rem;opacity:.85}
 .friend-battle-invite{padding:12px;border:1px solid #dbb8d0;border-radius:14px;margin-top:12px}
 @media(max-width:380px){.friend-battle-grid{grid-template-columns:1fr}.friend-battle-scene{gap:5px}.friend-battle-creature{padding:5px}}
-</style></head><body><header><strong>💗 AI Steady Mai SG</strong><div class="header-actions"><button class="header-mail" type="button" onclick="go('pager')" aria-label="Open Love Pager">📟<span class="pager-unread hidden"></span></button><button class="secondary" onclick="toggleTheme()" id="theme">🌙 Night mode</button></div></header><main id="app"></main><script src="app.js?v=46"></script><script src="friend-chat.js?v=37-7"></script><script src="love-journey-data.js?v=37-7"></script><script src="love-space.js?v=46"></script><script src="pet-roster.js?v=41"></script><script src="love-pet.js?v=47"></script><script src="friend-pet-battle.js?v=47"></script><script>window.addEventListener("load",()=>{try{render();if(typeof pagerMailboxCheck==="function")pagerMailboxCheck()}catch(e){console.error("AI Steady startup failure",e);const a=document.getElementById("app");if(a)a.innerHTML="<section class=\"card\"><h2>Unable to start</h2><p>Something went wrong loading the app. Your saved data has not been cleared.</p><p id=\"startup-detail\"></p></section>";const d=document.getElementById("startup-detail");if(d)d.textContent=String(e)}})</script></body></html>
+
+/* v48 — consistent form rhythm, polished battle actions and navigation */
+.relationship-profile-card{max-width:720px;margin-inline:auto;padding:clamp(18px,4vw,30px)!important}
+.relationship-profile-card h2{font-size:clamp(1.3rem,4.5vw,1.75rem);line-height:1.22;letter-spacing:-.025em;margin:0 0 10px}
+.relationship-profile-card>p.small{line-height:1.55;margin:0 0 23px;max-width:58ch}
+.relationship-profile-card label{display:block;margin:18px 0 8px;font-size:.94rem;font-weight:700;line-height:1.35}
+.relationship-profile-card input,.relationship-profile-card select{display:block;width:100%;max-width:100%;min-width:0;min-height:50px;height:50px;border-radius:14px;padding:11px 14px;font-size:16px;line-height:1.3;box-shadow:none;outline-offset:3px}
+.relationship-profile-card input[type=date]{display:block;text-align:left;appearance:auto;-webkit-appearance:auto;min-height:50px;height:50px}
+.relationship-profile-card input:focus-visible,.relationship-profile-card select:focus-visible{outline:2px solid #e84d79;border-color:#e84d79}
+.relationship-profile-card>button{display:block;width:100%;max-width:100%;min-height:50px;margin-top:24px;border-radius:14px;font-weight:750;white-space:normal}
+.relationship-profile-card #rel-feedback:empty{display:none}
+.relationship-profile-card #rel-feedback:not(:empty){margin:12px 0 0;line-height:1.5}
+.dark .relationship-profile-card input,.dark .relationship-profile-card select{background:#342a3c;color:#fff1f6;border-color:#72596f}
+.pet-battle-entry{max-width:720px;margin:18px auto!important;padding:clamp(18px,4vw,26px)!important}
+.pet-battle-entry h3{margin:0 0 10px;line-height:1.3;letter-spacing:-.01em}
+.pet-battle-entry>p{margin:0 0 18px;line-height:1.55;max-width:60ch}
+.pet-battle-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+.pet-battle-actions button{display:flex;justify-content:center;align-items:center;min-width:0;width:100%;min-height:52px;margin:0!important;padding:12px 14px!important;border-radius:14px;line-height:1.35;text-align:center;white-space:normal;font-weight:700}
+.pet-battle-actions button:disabled{opacity:.52;cursor:not-allowed}
+#friend-pet-invite:empty{display:none}
+#friend-pet-invite:not(:empty){margin-top:16px}
+.love-head .pill{display:inline-flex;align-items:center;width:max-content;max-width:100%;font-size:.88rem;line-height:1.3}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #e84d79;outline-offset:3px}
+@media(max-width:520px){
+ .pet-battle-actions{grid-template-columns:1fr}
+ .relationship-profile-card{padding:19px!important}
+ .relationship-profile-card>p.small{margin-bottom:20px}
+ .pet-battle-entry{padding:19px!important}
+}
+</style></head><body><header><strong>💗 AI Steady Mai SG</strong><div class="header-actions"><button class="header-mail" type="button" onclick="go('pager')" aria-label="Open Love Pager">📟<span class="pager-unread hidden"></span></button><button class="secondary" onclick="toggleTheme()" id="theme">🌙 Night mode</button></div></header><main id="app"></main><script src="app.js?v=48"></script><script src="friend-chat.js?v=37-7"></script><script src="love-journey-data.js?v=37-7"></script><script src="love-space.js?v=46"></script><script src="pet-roster.js?v=41"></script><script src="love-pet.js?v=48"></script><script src="friend-pet-battle.js?v=47"></script><script>window.addEventListener("load",()=>{try{render();if(typeof pagerMailboxCheck==="function")pagerMailboxCheck()}catch(e){console.error("AI Steady startup failure",e);const a=document.getElementById("app");if(a)a.innerHTML="<section class=\"card\"><h2>Unable to start</h2><p>Something went wrong loading the app. Your saved data has not been cleared.</p><p id=\"startup-detail\"></p></section>";const d=document.getElementById("startup-detail");if(d)d.textContent=String(e)}})</script></body></html>

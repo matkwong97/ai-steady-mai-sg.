@@ -53,7 +53,61 @@ let dexPage=0,dexStage=0;function dexSetStage(n){dexStage=n;dexPage=0;encycloped
 function encyclopedia(){if(!current)return;const p=enrich(current),items=allForms().filter(f=>f.stage===dexStage),found=verifiedDiscoveries(p),pages=Math.max(1,Math.ceil(items.length/12));dexPage=Math.min(dexPage,pages-1);const visible=items.slice(dexPage*12,dexPage*12+12),host=document.getElementById('pet-encyclopedia');if(!host)return;const count=allForms().filter(x=>found[x.id]).length;host.innerHTML=`<h3>📖 Love Pet Encyclopedia</h3><p class="muted">${count} of 56 creatures discovered. Unseen species stay mysterious until you raise them. Only forms you actually raise are unlocked. Older unverified variants are not counted.</p><div class="pet-dex-filters"><select aria-label="Evolution stage" onchange="LovePet.dexSetStage(Number(this.value))">${['Egg','Baby','Child','Teenager','Adult'].map((v,i)=>`<option value="${i}" ${i===dexStage?'selected':''}>${v}</option>`).join('')}</select><button class="secondary" onclick="LovePet.dexMove(-1)" ${dexPage===0?'disabled':''}>◀</button><span>${dexPage+1}/${pages}</span><button class="secondary" onclick="LovePet.dexMove(1)" ${dexPage>=pages-1?'disabled':''}>▶</button></div><div class="pet-dex-grid">${visible.map(f=>{const known=found[f.id];return `<div class="pet-dex-item ${known?'':'pet-unknown'}"><div class="pet-dex-art">${known?`<img src="${f.art}" alt="${safe(f.species)}" loading="lazy">`:`<div class="pet-dex-silhouette"><img src="${f.art}" alt="" loading="lazy"><span aria-label="Undiscovered creature">?</span></div>`}</div><b>${known?safe(f.species):'???'}</b><small>${known?safe(f.types.join(' / ')):'Unknown type'}</small><small>${known?safe(known.name||'Unnamed'):'Undiscovered'}</small>${known?`<details><summary>Moves & evolution</summary><small>${f.moves.map(m=>safe(m.name)+' · '+safe(m.type)+' · '+(m.power||'Support')).join('<br>')}</small><small>Care tendency: ${safe(Object.entries(known.traits||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]||'unknown')}</small></details>`:''}</div>`}).join('')}</div>`}
 function openDex(){const el=document.getElementById('pet-encyclopedia');if(!el)return;el.hidden=!el.hidden;if(!el.hidden)encyclopedia()}
 function speak(kind){const p=current;if(!p)return;const lines={feed:['That was delicious!','Yum! Thank you!','My tummy is happy!'],touch:['Hehe, that tickles!','I love cuddles!','So nice to see you!'],groom:['Looking fresh!','Wah, so clean!','Sparkly and happy!'],play:['Again, again!','That was fun!','Let’s play more!'],rest:['Time for a nap!','Zzz… sweet dreams!','Feeling refreshed!'],evolve:['I feel different!','Look at my new form!','I grew because of you!']};const arr=lines[kind]||['I’m happy you’re here!'];const text=arr[Math.floor(Math.random()*arr.length)];const el=document.getElementById('pet-speech');if(el)el.textContent=text}
-async function share(){if(!current)return;const p=enrich(current);const el=document.querySelector('#pet-root .pet-creature');if(!el)return;try{const artSrc=el.getAttribute('src');const canvas=document.createElement('canvas');canvas.width=900;canvas.height=1100;const ctx=canvas.getContext('2d');const colors=COLORS[p.color]||COLORS.pink;ctx.fillStyle=colors;ctx.fillRect(0,0,900,1100);ctx.fillStyle='#27343b';ctx.fillRect(65,135,770,720);ctx.fillStyle='#b6e8cb';ctx.fillRect(92,165,716,660);ctx.fillStyle='#27343b';ctx.textAlign='center';ctx.font='bold 44px sans-serif';ctx.fillText('♡ LOVE PET',450,235);const img=new Image();await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=artSrc});ctx.drawImage(img,160,255,580,470);ctx.font='bold 44px sans-serif';ctx.fillText((p.name||'My Love Pet').slice(0,24),450,750);ctx.font='32px sans-serif';ctx.fillText(species(p).slice(0,32),450,800);ctx.fillStyle='#ffffff';ctx.font='bold 34px sans-serif';ctx.fillText('AI STEADY MAI SG',450,960);ctx.font='24px sans-serif';ctx.fillText('Made with love ♡',450,1005);const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));if(!blob)throw Error('Image could not be created');const file=new File([blob],'love-pet.png',{type:'image/png'});if(navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:`Meet ${p.name||'my Love Pet'}!`})}else{const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='AI-Steady-Mai-SG-Love-Pet.png';link.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}}catch(e){if(e.name!=='AbortError')msg('Unable to share image: '+e.message)}}
+async function share(){
+  if(!current)return;
+  const p=enrich(current), creature=form(p), artSrc=creature.art;
+  try{
+    const img=new Image();
+    await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=artSrc});
+    const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;
+    const c=canvas.getContext('2d');if(!c)throw Error('Canvas unavailable');
+    const W=1080,H=1350,caseColor=COLORS[p.color]||COLORS.pink;
+    function rounded(x,y,w,h,r,fill,stroke,lw=1){c.beginPath();c.roundRect(x,y,w,h,r);if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.lineWidth=lw;c.strokeStyle=stroke;c.stroke()}}
+    function cover(im,x,y,w,h){const r=Math.max(w/im.width,h/im.height),iw=im.width*r,ih=im.height*r;c.drawImage(im,x+(w-iw)/2,y+(h-ih)/2,iw,ih)}
+    function center(t,x,y,font,color){c.font=font;c.fillStyle=color;c.textAlign='center';c.fillText(t,x,y)}
+    function fit(t,max,fontSize=56){let n=fontSize;while(n>24){c.font=`700 ${n}px system-ui, sans-serif`;if(c.measureText(t).width<=max)break;n-=2}return n}
+    // Editorial card background and a soft atmospheric glow.
+    const bg=c.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#14131f');bg.addColorStop(.55,'#252033');bg.addColorStop(1,'#10151d');c.fillStyle=bg;c.fillRect(0,0,W,H);
+    c.save();c.globalAlpha=.12;c.filter='blur(95px)';cover(img,-90,-30,1260,1100);c.restore();
+    rounded(52,47,976,1252,56,'#191a26','#ffffff26',2);
+    center('A LITTLE LOVE, A LITTLE MAGIC',540,121,'600 24px system-ui, sans-serif','#e8d8e5');
+    // Three-dimensional toy case, matching the selected case colour.
+    c.save();c.shadowColor='#000000aa';c.shadowBlur=34;c.shadowOffsetY=22;
+    rounded(102,178,876,940,90,'#26313a');c.restore();
+    const shell=c.createLinearGradient(115,195,930,1090);shell.addColorStop(0,'#ffffffa0');shell.addColorStop(.10,caseColor);shell.addColorStop(.66,caseColor);shell.addColorStop(1,'#25212c');
+    rounded(124,196,832,895,74,shell,'#ffffff70',7);
+    const highlight=c.createLinearGradient(0,210,0,490);highlight.addColorStop(0,'#ffffff55');highlight.addColorStop(1,'#ffffff00');rounded(152,218,776,820,58,highlight,'#ffffff45',3);
+    c.textAlign='left';c.fillStyle='#26313a';c.font='800 28px system-ui, sans-serif';c.fillText('♡ LOVE PET',185,280);
+    c.textAlign='right';c.fillText(`DAY ${Math.max(0,Math.floor((now()-p.born)/day))}`,892,280);
+    // Dark inset bezel and the illustrated LCD world.
+    rounded(169,318,742,654,51,'#17212b','#71838d',10);
+    rounded(192,341,696,608,32,'#0d1b24','#071017',5);
+    c.save();c.beginPath();c.roundRect(207,356,666,578,22);c.clip();
+    // Reuse the exact original artwork as the entire world: no floating photo rectangle.
+    c.save();c.filter='blur(17px) brightness(.77) saturate(.9)';cover(img,175,324,730,642);c.restore();
+    // Feather the original scene over its own enlarged backdrop.
+    const art=document.createElement('canvas');art.width=666;art.height=578;
+    const ac=art.getContext('2d');const r=Math.max(666/img.width,578/img.height);ac.drawImage(img,(666-img.width*r)/2,(578-img.height*r)/2,img.width*r,img.height*r);
+    ac.globalCompositeOperation='destination-in';const mask=ac.createRadialGradient(333,292,150,333,292,390);mask.addColorStop(0,'#000');mask.addColorStop(.63,'#000');mask.addColorStop(1,'#0000');ac.fillStyle=mask;ac.fillRect(0,0,666,578);
+    c.drawImage(art,207,356);
+    // LCD sheen, fine scanlines, and a grounded shadow from the original artwork.
+    const sheen=c.createLinearGradient(215,356,850,900);sheen.addColorStop(0,'#ffffff36');sheen.addColorStop(.24,'#ffffff05');sheen.addColorStop(.73,'#ffffff00');sheen.addColorStop(1,'#a9edff20');c.fillStyle=sheen;c.fillRect(207,356,666,578);
+    c.fillStyle='#06172213';for(let y=357;y<934;y+=5)c.fillRect(207,y,666,1);
+    c.restore();
+    rounded(207,356,666,578,22,null,'#ffffff38',2);
+    rounded(170,991,740,2,1,'#ffffff50');
+    c.textAlign='left';c.fillStyle='#26313a';c.font='700 21px system-ui, sans-serif';c.fillText('♡ AI STEADY MAI SG',186,1040);
+    c.textAlign='right';c.fillText('CARE · GROW · LOVE',889,1040);
+    const displayName=(p.name||'My Love Pet').slice(0,30),speciesName=species(p);
+    center(displayName,540,1190,`700 ${fit(displayName,860,58)}px system-ui, sans-serif`,'#fff3f7');
+    center(`${speciesName}  ·  ${['Egg','Baby','Child','Teenager','Adult','Memory'][stage(p)]||'Love Pet'}`,540,1236,'400 28px system-ui, sans-serif','#c7c2d1');
+    const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));
+    if(!blob)throw Error('Image could not be created');
+    const file=new File([blob],'AI-Steady-Mai-SG-Love-Pet.png',{type:'image/png'});
+    if(navigator.canShare?.({files:[file]}))await navigator.share({files:[file],title:`Meet ${displayName}!`});
+    else{const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='AI-Steady-Mai-SG-Love-Pet.png';link.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+  }catch(e){if(e.name!=='AbortError')msg('Unable to share image: '+e.message)}
+}
 
 function controls(){return `<div class="pet-controls"><button onclick="LovePet.act('feed')">🍎<small>Feed</small></button><button onclick="LovePet.act('touch')">💗<small>Touch</small></button><button onclick="LovePet.act('groom')">🧼<small>Groom</small></button><button onclick="LovePet.act('play')">🎾<small>Play</small></button><button onclick="LovePet.act('rest')">🌙<small>Rest</small></button></div>`}
 function render(){if(!document.getElementById('pet-root'))return;const p=current;const root=document.getElementById('pet-root');if(!p){root.innerHTML='<div class="card"><p>Choose a pet mode to begin.</p></div>';return}
